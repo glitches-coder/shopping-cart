@@ -1,45 +1,52 @@
-# 🛒 MiniCart Frontend (React + Vite + Tailwind)
+# 🛒 MiniCart Backend (Spring Boot + JWT)
 
-A lightweight **full-stack shopping cart frontend** built using **React (Vite)** and **Tailwind CSS**, integrated with a **Spring Boot backend** secured using JWT authentication.
+A lightweight **Spring Boot backend application** that powers a full-stack shopping cart system with **JWT-based authentication**, **REST APIs**, and **H2 in-memory database**.
 
 ---
 
 ## 🚀 Features
 
-* 🔐 JWT-based authentication (login system)
-* 🛍️ View products from backend API
-* ➕ Add items to cart
-* ❌ Remove items from cart
-* 🧾 Checkout flow with address form
-* ⚛️ Demonstrates both:
-
-  * Controlled components (Login form)
-  * Uncontrolled components (Checkout form)
-* 🎨 Clean UI using Tailwind CSS
+* 🔐 JWT-based authentication (stateless)
+* 🛍️ Product listing API
+* 🛒 Add/remove items from cart
+* 📦 View cart items
+* 🧾 Checkout flow with address input
+* ⚡ In-memory database (H2) for quick setup
+* 🔒 Protected APIs using Spring Security + JWT filter
 
 ---
 
 ## 🧱 Tech Stack
 
-* **React (Vite)**
-* **Tailwind CSS v3.4.17**
-* **Axios (API calls)**
-* **Spring Boot Backend (JWT secured)**
+* **Java 17+**
+* **Spring Boot**
+* **Spring Web**
+* **Spring Security**
+* **Spring Data JPA**
+* **H2 Database**
+* **JWT (jjwt 0.11.5)**
 
 ---
 
 ## 📁 Project Structure
 
-```
-src/
-├── components/
-│   ├── Login.jsx
-│   ├── Products.jsx
-│   ├── Cart.jsx
-│   └── Checkout.jsx
-├── App.jsx
-├── main.jsx
-└── api.js
+```id="qv0qj7"
+src/main/java/com/example/shopping_cart/
+├── controller/
+│   ├── AuthController.java
+│   └── CartController.java
+├── service/
+│   └── CartService.java
+├── repository/
+│   └── ProductRepository.java
+├── model/
+│   └── Product.java
+├── security/
+│   ├── JwtUtil.java
+│   └── JwtFilter.java
+├── config/
+│   └── SecurityConfig.java
+└── DataLoader.java
 ```
 
 ---
@@ -48,119 +55,169 @@ src/
 
 ### 1️⃣ Clone the repository
 
-```
+```id="vblqgj"
 git clone <your-repo-url>
-cd minicart-frontend
+cd minicart-backend
 ```
 
 ---
 
 ### 2️⃣ Install dependencies
 
-```
-npm install
-```
+Make sure you have:
 
----
+* Java 17+
+* Maven
 
-### 3️⃣ Setup Tailwind CSS
+Then run:
 
-Already configured for **v3.4.17**, but if needed:
-
-```
-npm install -D tailwindcss@3.4.17 postcss autoprefixer
-npx tailwindcss init -p
+```id="eqqap6"
+mvn clean install
 ```
 
 ---
 
-### 4️⃣ Start development server
+### 3️⃣ Run the application
 
-```
-npm run dev
-```
-
-👉 App runs on:
-
-```
-http://localhost:5173
+```id="g8g9zb"
+mvn spring-boot:run
 ```
 
----
+👉 Server runs on:
 
-## 🔗 Backend Requirements
-
-Make sure your **Spring Boot backend** is running on:
-
-```
+```id="kzcltc"
 http://localhost:8080
 ```
 
-### Required APIs:
+---
 
-| Endpoint         | Method | Description       |
-| ---------------- | ------ | ----------------- |
-| `/auth/login`    | POST   | Login and get JWT |
-| `/api/products`  | GET    | Fetch products    |
-| `/api/cart/{id}` | POST   | Add to cart       |
-| `/api/cart`      | GET    | Get cart          |
-| `/api/cart/{id}` | DELETE | Remove item       |
-| `/api/checkout`  | POST   | Checkout          |
+## 🗄️ H2 Database
+
+Access H2 console:
+
+```id="dx2vsc"
+http://localhost:8080/h2-console
+```
+
+### Default Config:
+
+* JDBC URL: `jdbc:h2:mem:testdb`
+* Username: `sa`
+* Password: *(empty)*
 
 ---
 
 ## 🔐 Authentication Flow
 
-1. User logs in via **Login component**
-2. Backend returns JWT token
-3. Token stored in React state
-4. Token sent in headers:
+1. User sends login request:
 
+```id="dfjkjf"
+POST /auth/login
 ```
+
+2. Backend validates credentials
+
+3. JWT token is generated
+
+4. Token returned to client
+
+5. Client sends token in headers:
+
+```id="l5rmcq"
 Authorization: Bearer <token>
 ```
+
+6. JWT filter validates token for protected APIs
+
+---
+
+## 📡 API Endpoints
+
+### 🔓 Public
+
+| Method | Endpoint      | Description       |
+| ------ | ------------- | ----------------- |
+| POST   | `/auth/login` | Authenticate user |
+
+---
+
+### 🔒 Protected (Require JWT)
+
+| Method | Endpoint         | Description      |
+| ------ | ---------------- | ---------------- |
+| GET    | `/api/products`  | Get all products |
+| POST   | `/api/cart/{id}` | Add item to cart |
+| GET    | `/api/cart`      | View cart        |
+| DELETE | `/api/cart/{id}` | Remove item      |
+| POST   | `/api/checkout`  | Checkout         |
+
+---
+
+## 🔐 Security Configuration
+
+* `/auth/**` → Public
+* `/h2-console/**` → Public
+* All other endpoints → Protected
+
+JWT validation handled via:
+
+* Custom filter (`JwtFilter`)
+* Spring Security context
 
 ---
 
 ## 🧠 Key Concepts Demonstrated
 
-### 🔹 Controlled Components
+### 🔹 JWT Authentication
 
-Used in login form:
+* Stateless authentication
+* Token-based authorization
+* Secure API access
 
-* React state controls input values
+---
 
-### 🔹 Uncontrolled Components
+### 🔹 Spring Security
 
-Used in checkout:
+* Filter chain configuration
+* Endpoint protection
+* Authentication context
 
-* `useRef` to access DOM values
+---
 
-### 🔹 API Integration
+### 🔹 REST API Design
 
-* Axios used for REST communication
-* Token-based authentication
+* Clean endpoint structure
+* Proper HTTP methods
+* JSON-based communication
+
+---
+
+### 🔹 Database (H2)
+
+* In-memory DB for fast prototyping
+* Preloaded product data using `CommandLineRunner`
 
 ---
 
 ## ⚡ Future Improvements
 
-* Store JWT in HttpOnly cookies (better security)
-* Add user-specific cart
-* Improve UI/UX
-* Add loading & error states
-* Deploy using Docker + Kubernetes
+* Use MySQL/PostgreSQL instead of H2
+* Implement user-specific cart
+* Add password hashing (BCrypt)
+* Store JWT in HttpOnly cookies
+* Add role-based authorization
+* Add global exception handling
 
 ---
 
 ## 🧪 Testing
 
-Use Postman or frontend UI:
+Use Postman:
 
-1. Login → get token
-2. Add products to cart
-3. Remove items
-4. Checkout
+1. Login → get JWT
+2. Use token for protected APIs
+3. Test CRUD operations
+4. Verify unauthorized access without token
 
 ---
 
@@ -168,11 +225,11 @@ Use Postman or frontend UI:
 
 This project demonstrates:
 
-* Full-stack integration (React + Spring Boot)
-* JWT authentication flow
-* State management in React
-* REST API communication
-* Clean component architecture
+* End-to-end authentication using JWT
+* Spring Security integration
+* RESTful API design
+* Backend + frontend integration
+* Clean architecture with separation of concerns
 
 ---
 
@@ -184,6 +241,10 @@ Aditya Mohapatra
 
 ## 📌 Notes
 
-This project is built as part of **full-stack interview preparation** and focuses on **clarity, fundamentals, and real-world flow** rather than production-grade complexity.
+This project is built for **full-stack interview preparation**, focusing on:
+
+* Simplicity
+* Clarity
+* Real-world API flow
 
 ---
